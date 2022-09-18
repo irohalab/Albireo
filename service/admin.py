@@ -592,6 +592,7 @@ class AdminService:
                                    download_url=video_dict.get('download_url'),
                                    file_path=video_dict.get('file_path'),
                                    file_name=video_dict.get('file_name'),
+                                   subtitle_path=video_dict.get('subtitle_path'),
                                    status=video_dict.get('status', 1),
                                    resolution_w=video_dict.get('resolution_w'),
                                    resolution_h=video_dict.get('resolution_h'),
@@ -611,6 +612,7 @@ class AdminService:
             video_file.download_url = video_dict.get('download_url')
             video_file.file_path = video_dict.get('file_path')
             video_file.file_name = video_dict.get('file_name')
+            video_file.subtitle_path = video_dict.get('subtitle_path')
             video_file.status = video_dict.get('status', 1)
             video_file.resolution_w = video_dict.get('resolution_w')
             video_file.resolution_h = video_dict.get('resolution_h')

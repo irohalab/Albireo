@@ -28,7 +28,7 @@ class DownloadManager:
         self.download_manager_url = config['download_manager_url']
 
     @inlineCallbacks
-    def on_download_completed(self, video_id, file_path):
+    def on_download_completed(self, video_id, file_path, subtitle_path):
         logger.info('Download complete: %s ', video_id)
 
         def create_thumbnail(episode):
@@ -63,6 +63,7 @@ class DownloadManager:
                     filter(Episode.id == VideoFile.episode_id).\
                     one()
                 video_file.file_path = file_path
+                video_file.subtitle_path = subtitle_path
                 video_file.status = VideoFile.STATUS_DOWNLOADED
                 episode.update_time = datetime.utcnow()
                 episode.status = Episode.STATUS_DOWNLOADED

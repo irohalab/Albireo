@@ -14,6 +14,7 @@ class VideoFile(Base):
 
     file_name = Column(String, nullable=True)
     file_path = Column(String, nullable=True)  # file path is real path to the file in filesystem
+    subtitle_path = Column(String, nullable=True)  # subtitle file path, can be null
     # deprecated
     torrent_id = Column(String, nullable=True)  # torrent_id is deluge torrent id associated with this file, for imported file, torrent_id should be null
 

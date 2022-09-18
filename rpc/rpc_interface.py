@@ -267,13 +267,15 @@ def delete_deluge_torrent(torrent_id):
 
 
 @rpc_export
-def download_complete(video_id, bangumi_id, file_path):
+def download_complete(video_id, bangumi_id, file_path, subtitle_path=None):
 
     from utils.DownloadManager import download_manager
     # idx = file_path.find(bangumi_id)
     # file_path = file_path[idx + len(bangumi_id):]
     file_path = urllib.unquote(str(file_path)).decode('utf-8')
-    logger.info('download complete ' + video_id + " file: " + file_path)
+    if subtitle_path is not None:
+        subtitle_path = urllib.unquote(str(subtitle_path)).decode('utf-8')
+    logger.info('download complete ' + video_id + " file: " + file_path + " subtitle: " + subtitle_path)
 
     def on_success(result):
         logger.info('post process of video file ' + video_id + ' completed, bangumi_id: ' + bangumi_id)
@@ -281,6 +283,6 @@ def download_complete(video_id, bangumi_id, file_path):
     def on_fail(err):
         logger.error(err)
 
-    d = download_manager.on_download_completed(video_id, file_path)
+    d = download_manager.on_download_completed(video_id, file_path, subtitle_path)
     d.addCallback(on_success)
     d.addErrback(on_fail)
