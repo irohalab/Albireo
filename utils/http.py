@@ -65,6 +65,10 @@ def is_absolute_url(test_url):
 class FileDownloader:
 
     def __init__(self):
+        self.proxy = None
+        config = yaml.load(open('./config/config.yml', 'r'))
+        if 'bgm' in config:
+            self.proxy = config['bgm'].get('proxy', None)
         self.session = requests.Session()
         self.session.headers.update({
             'User-Agent': user_agent
@@ -74,7 +78,7 @@ class FileDownloader:
         if force_https and url.startswith('http://'):
             url = url.replace('http://', 'https://', 1)
         print url
-        r = self.session.get(url, stream=True)
+        r = self.session.get(url, stream=True, proxies=self.proxy)
 
         if r.status_code > 399:
             r.raise_for_status()
@@ -88,7 +92,10 @@ class FileDownloader:
 class BangumiRequest:
 
     def __init__(self):
-
+        self.proxy = None
+        config = yaml.load(open('./config/config.yml', 'r'))
+        if 'bgm' in config:
+            self.proxy = config['bgm'].get('proxy', None)
         # persist request for accessing bangumi api
         self.session = requests.Session()
         self.session.headers.update({
@@ -125,7 +132,7 @@ class BangumiRequest:
 
     def get(self, url):
         self.__get_cookie_from_storage()
-        r = self.session.get(url)
+        r = self.session.get(url, proxies=self.proxy)
         self.__save_cookie_to_storage()
         return r
 
@@ -133,7 +140,6 @@ class BangumiRequest:
 class BangumiMoeRequest:
 
     def __init__(self):
-
         # persist request for accessing bangumi api
         self.session = requests.Session()
         self.session.headers.update({

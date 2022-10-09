@@ -23,6 +23,11 @@ task:
     scan_time: # A download status scanner will scheduled for once a day at this particular time. it is not an accurate time, default is 23:00
     scan_time_format: # default is '%H:%M' see https://docs.python.org/2/library/datetime.html#strftime-strptime-behavior
 
+bgm:
+  proxy: # http proxy
+    # http: 'http://172.17.0.1:8080'
+    # https: 'http://172.17.0.1:8080'
+
 download:
   location: /  # change this location
 
