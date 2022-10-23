@@ -28,3 +28,10 @@ def list_jobs():
 def enhance_file_mapping():
     data = json.loads(request.get_data(True, as_text=True))
     return download_manager_service.enhance_file_mapping(data)
+
+
+@download_manager_api.route('/job/<job_id>/resend-finish-message', methods=['PUT'])
+@login_required
+@auth_user(User.LEVEL_ADMIN)
+def resend_finish_message(job_id):
+    return download_manager_service.resend_finish_message(job_id)

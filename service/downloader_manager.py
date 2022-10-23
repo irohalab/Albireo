@@ -65,5 +65,12 @@ class DownloadManagerService:
         finally:
             SessionManager.Session.remove()
 
+    def resend_finish_message(self, job_id):
+        resp = requests.put('{0}/download/job/{1}/resend-finish-message'.format(self.download_manager_url, job_id),
+                            None)
+        return json_resp({
+            'status': resp.json()['status']
+        })
+
 
 download_manager_service = DownloadManagerService()
