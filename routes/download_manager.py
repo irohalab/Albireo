@@ -6,20 +6,16 @@ from flask_login import login_required
 from domain.User import User
 from service.auth import auth_user
 from service.downloader_manager import download_manager_service
-from utils.exceptions import ClientError
 
 download_manager_api = Blueprint('download_manager', __name__)
 
 
-@download_manager_api.route('/job', methods=['GET'])
+@download_manager_api.route('/proxy', methods=['POST'])
 @login_required
 @auth_user(User.LEVEL_ADMIN)
-def list_jobs():
-    status = request.args.get('status')
-    if status is None:
-        raise ClientError(400)
-    else:
-        return download_manager_service.get_jobs(status)
+def proxy():
+    req_data = json.loads(request.get_data(True, as_text=True))
+    return download_manager_service.proxy(req_data)
 
 
 @download_manager_api.route('/file-mapping', methods=['POST'])
@@ -30,8 +26,9 @@ def enhance_file_mapping():
     return download_manager_service.enhance_file_mapping(data)
 
 
-@download_manager_api.route('/job/<job_id>/resend-finish-message', methods=['PUT'])
+@download_manager_api.route('/bangumi', methods=['POST'])
 @login_required
 @auth_user(User.LEVEL_ADMIN)
-def resend_finish_message(job_id):
-    return download_manager_service.resend_finish_message(job_id)
+def get_bangumi_from_ids():
+    data = json.loads(request.get_data(True, as_text=True))
+    return download_manager_service.get_bangumi_from_ids(data['ids'])
