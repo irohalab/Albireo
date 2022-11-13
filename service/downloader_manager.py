@@ -19,34 +19,21 @@ class DownloadManagerService:
         config = yaml.load(fr)
         self.download_manager_url = config['download_manager_url']
 
-    def get_jobs(self, status):
-        resp = requests.get(self.download_manager_url + '/download/job', params={
-            'status': status
-        })
-
-        jobs = resp.json()['data']
-        bangumi_id_set = set()
-
-        for job in jobs:
-            bangumi_id_set.add(job['bangumiId'])
-
-        bangumi_id_list = list(bangumi_id_set)
-        session = SessionManager.Session()
-        try:
-            bangumi_list = session.query(Bangumi).\
-                filter(Bangumi.id.in_(bangumi_id_list)).\
-                all()
-            for bangumi in bangumi_list:
-                bgm = row2dict(bangumi, Bangumi)
-                for job in jobs:
-                    if job['bangumiId'] == str(bangumi.id):
-                        job['bangumi'] = bgm
-            return json_resp({
-                'data': jobs,
-                'total': len(jobs)
-            })
-        finally:
-            SessionManager.Session.remove()
+    def proxy(self, req_data):
+        req_method = req_data['method']
+        req_url = self.download_manager_url + req_data['url']
+        if req_method == 'GET':
+            params = req_data.get('params')
+            return requests.get(req_url, params=params).json()
+        elif req_method == 'POST':
+            body = req_data.get('body')
+            return requests.post(req_url, json=body).json()
+        elif req_method == 'PUT':
+            body = req_data.get('body')
+            return requests.put(req_url, json=body).json()
+        elif req_method == 'DELETE':
+            params = req_data.get('params')
+            return requests.delete(req_url, params=params).json()
 
     def enhance_file_mapping(self, file_mapping):
         video_id_list = [entry['videoId'] for entry in file_mapping]
@@ -65,12 +52,19 @@ class DownloadManagerService:
         finally:
             SessionManager.Session.remove()
 
-    def resend_finish_message(self, job_id):
-        resp = requests.put('{0}/download/job/{1}/resend-finish-message'.format(self.download_manager_url, job_id),
-                            None)
-        return json_resp({
-            'status': resp.json()['status']
-        })
+    def get_bangumi_from_ids(self, id_list):
+        session = SessionManager.Session()
+        try:
+            result = session.query(Bangumi).\
+                filter(Bangumi.id.in_(id_list)).\
+                all()
+            bangumi_dict_list = []
+            for bgm in result:
+                bangumi = row2dict(bgm, Bangumi)
+                bangumi_dict_list.append(bangumi)
+            return json_resp({'data': bangumi_dict_list, 'total': len(bangumi_dict_list)})
+        finally:
+            SessionManager.Session.remove()
 
 
 download_manager_service = DownloadManagerService()
