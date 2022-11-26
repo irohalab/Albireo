@@ -1,4 +1,10 @@
 # Changelog
+## 4.2.0
+- Update download manager api, add a proxy method for some of the download manager api.
+
+## 4.1.0
+- add bgm proxy
+
 ## 4.0.5
 - Fix bug that old video_file cannot be removed.
 
