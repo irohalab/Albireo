@@ -29,6 +29,7 @@ def on_air_bangumi():
 
 
 @home_api.route('/my_bangumi', methods=['GET'])
+@login_required
 @auth_user(0)
 def my_bangumi():
     status = int(request.args.get('status', Favorites.WATCHING))

@@ -37,6 +37,8 @@ def delete_announce(announce_id):
 
 
 @announce_api.route('/<announce_id>', methods=['PUT'])
+@login_required
+@auth_user(User.LEVEL_ADMIN)
 def update_announce(announce_id):
     announce_dict = json.loads(request.get_data(as_text=True))
     return announce_service.update_announce(announce_id, announce_dict)
