@@ -53,5 +53,6 @@ def synchronize_history():
 
 
 @watch_api.route('/favorite/check/<bangumi_id>', methods=['PUT'])
+@login_required
 def check_favorite(bangumi_id):
     return watch_service.check_favorite(bangumi_id, current_user.id)
