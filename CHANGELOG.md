@@ -1,4 +1,8 @@
 # Changelog
+
+## 4.2.1
+- Fix vulnerability on some API which lacks of permission check.
+
 ## 4.2.0
 - Update download manager api, add a proxy method for some of the download manager api.
 
