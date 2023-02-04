@@ -578,8 +578,9 @@ class AdminService:
             video_file_list = session.query(VideoFile).\
                 filter(VideoFile.episode_id == episode_id).\
                 all()
-
             result = [row2dict(video_file, VideoFile) for video_file in video_file_list]
+            for video_file_dict in result:
+                video_file_dict['url'] = utils.generate_video_link(str(video_file_dict['bangumi_id']), video_file_dict['file_path'])
             return json_resp({'data': result})
         finally:
             SessionManager.Session.remove()
