@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.2.2
+- Add url in admin API's list video files
+
 ## 4.2.1
 - Fix vulnerability on some API which lacks of permission check.
 
