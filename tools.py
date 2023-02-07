@@ -1,4 +1,7 @@
 import argparse
+
+from sqlalchemy.orm import joinedload
+
 from utils.SessionManager import SessionManager
 from werkzeug.security import generate_password_hash
 
@@ -38,6 +41,7 @@ group.add_argument('--db-init', action='store_true', help='init database, if tab
 group.add_argument('--cover', action='store_true',
                    help='scan bangumi, download missing cover or generate missing color palette')
 group.add_argument('--bgm-reset', nargs=1, metavar=('BANGUMI_ID'), help='clear a bangumi\'s related table records')
+group.add_argument('--clean-video', action='store_true', help='clean all unlinked video, use with caution')
 
 args = parser.parse_args()
 
@@ -181,7 +185,10 @@ elif args.bgm_reset:
     print('cleared')
     SessionManager.Session.remove()
 
-
+elif args.clean_video:
+    print('Query all bangumi and video_file')
+    session = SessionManager.Session()
+    video_file_list = session.query(VideoFile).options(joinedload(Bangumi)).all()
 
 else:
     parser.print_help()
