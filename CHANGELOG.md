@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.2.3
+Fix Admin API list episode video file got 500 when video file is not completed
+
 ## 4.2.2
 - Add url in admin API's list video files
 
