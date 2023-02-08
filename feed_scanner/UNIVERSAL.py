@@ -55,10 +55,8 @@ class UNIVERSAL(AbstractScanner):
             if len(eps_list) == 0:
                 continue
             for eps in eps_list:
-                if self.mode == 'nyaa' or self.mode == 'dmhy':
-                    download_uri = item['magnet_uri']
-                else:
-                    download_uri = item['torrent_url']
+                # currently bangumi.moe has issue with downloading torrent file. so just use magnet_uri for all mode
+                download_uri = item['magnet_uri']
                 result_list.append((download_uri, eps['eps_no'], eps['file_path'], eps['file_name']))
 
         logger.debug(result_list)
