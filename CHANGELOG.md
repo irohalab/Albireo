@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.2.4
+Use magnet_uri for all modes to workaround with bangumi.moe torrent download issue.
+
 ## 4.2.3
 Fix Admin API list episode video file got 500 when video file is not completed
 
