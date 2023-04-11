@@ -129,7 +129,7 @@ class WatchService:
                 watch_progress.percentage = percentage
                 session.commit()
 
-            return json_resp({'message': 'ok', 'status': 0})
+            return json_resp({'message': 'ok', 'data': str(watch_progress.id), 'status': 0})
         finally:
             SessionManager.Session.remove()
 
