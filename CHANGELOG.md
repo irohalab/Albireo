@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.3.0
+Add watch_progress.id to the response of update history(/watch/history/<episode_id>) API
+
 ## 4.2.4
 Use magnet_uri for all modes to workaround with bangumi.moe torrent download issue.
 
