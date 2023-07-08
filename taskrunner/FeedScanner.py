@@ -39,8 +39,10 @@ class FeedScanner:
     def __query_video_file(self):
         session = SessionManager.Session()
         try:
-            return session.query(VideoFile).\
+            return session.query(VideoFile, Episode).\
+                join(Episode).\
                 filter(VideoFile.download_url != None).\
+                filter(Episode.id == VideoFile.episode_id).\
                 filter(VideoFile.status == VideoFile.STATUS_DOWNLOAD_PENDING).\
                 all()
         finally:
@@ -49,7 +51,7 @@ class FeedScanner:
     def __query_downloading_video_file(self):
         session = SessionManager.Session()
         try:
-            return session.query(VideoFile).\
+            return session.query(VideoFile, Episode).\
                 filter(VideoFile.torrent_id != None).\
                 filter(VideoFile.status != VideoFile.STATUS_DOWNLOADED).\
                 all()
@@ -59,7 +61,7 @@ class FeedScanner:
     def __update_video_file(self, video_file_list, task_id):
         session = SessionManager.Session()
         try:
-            for video_file in video_file_list:
+            for video_file, episode in video_file_list:
                 session.add(video_file)
                 video_file.task_id = task_id
                 video_file.status = VideoFile.STATUS_DOWNLOADING
@@ -110,17 +112,21 @@ class FeedScanner:
     def __add_download(self, video_file_list):
         logger.debug(video_file_list)
         download_url_dict = {}
-        for video_file in video_file_list:
+        for video_file, episode in video_file_list:
             if video_file.download_url not in download_url_dict:
                 download_url_dict[video_file.download_url] = []
-            download_url_dict[video_file.download_url].append(video_file)
+            download_url_dict[video_file.download_url].append((video_file, episode))
 
         for download_url, same_torrent_video_file_list in download_url_dict.iteritems():
-            first_video_file = same_torrent_video_file_list[0]
+            first_video_file = same_torrent_video_file_list[0][0]
             file_mapping = None
             video_id = None
             if len(same_torrent_video_file_list) > 1 or same_torrent_video_file_list[0].file_path is not None:
-                file_mapping = [{'filePath': video_file.file_path, 'videoId': str(video_file.id)} for video_file in same_torrent_video_file_list]
+                file_mapping = [{
+                    'filePath': video_file.file_path,
+                    'videoId': str(video_file.id),
+                    'episodeNo': episode.episode_no
+                } for video_file, episode in same_torrent_video_file_list]
             else:
                 video_id = str(first_video_file.id)
             # bangumi_path = self.base_path + '/' + str(first_video_file.bangumi_id)

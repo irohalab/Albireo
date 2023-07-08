@@ -46,7 +46,9 @@ class DownloadManagerService:
                 all()
             for entry in file_mapping:
                 for video_file, episode in result:
-                    entry['episode'] = row2dict(episode, Episode)
+                    if str(video_file.id) == entry['videoId']:
+                        entry['episode'] = row2dict(episode, Episode)
+                        break
 
             return json_resp({'data': file_mapping, 'total': len(file_mapping)})
         finally:
