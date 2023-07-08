@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.3.1
+Fix a bug in FeedScanner
+
 ## 4.3.0
 Add episodeNo in FileMapping
 

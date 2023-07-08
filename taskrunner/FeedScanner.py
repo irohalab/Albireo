@@ -121,7 +121,7 @@ class FeedScanner:
             first_video_file = same_torrent_video_file_list[0][0]
             file_mapping = None
             video_id = None
-            if len(same_torrent_video_file_list) > 1 or same_torrent_video_file_list[0].file_path is not None:
+            if len(same_torrent_video_file_list) > 1 or same_torrent_video_file_list[0][0].file_path is not None:
                 file_mapping = [{
                     'filePath': video_file.file_path,
                     'videoId': str(video_file.id),
