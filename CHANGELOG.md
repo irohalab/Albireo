@@ -1,6 +1,9 @@
 # Changelog
 
 ## 4.3.0
+Add episodeNo in FileMapping
+
+## 4.2.5
 Add watch_progress.id to the response of update history(/watch/history/<episode_id>) API
 
 ## 4.2.4
