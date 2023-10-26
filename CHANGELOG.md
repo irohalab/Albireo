@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.4.0
+- Add support for keyframe and thumbnail from mira-video-manager
+- metadata will not from this service but from mira-video-manager
+- API for keyframe preview images
+
 ## 4.3.1
 Fix a bug in FeedScanner
 
