@@ -28,7 +28,7 @@ class DownloadManager:
         self.download_manager_url = config['download_manager_url']
 
     @inlineCallbacks
-    def on_download_completed(self, video_id, file_path):
+    def on_download_completed(self, video_id, file_path, metadata):
         logger.info('Download complete: %s ', video_id)
 
         def create_thumbnail(episode):
@@ -48,11 +48,14 @@ class DownloadManager:
                 logger.error(error, exc_info=True)
 
         def update_video_meta(video_file):
-            meta = video_manager.get_video_meta(u'{0}/{1}/{2}'.format(self.base_path, str(video_file.bangumi_id), video_file.file_path))
-            if meta is not None:
-                video_file.duration = meta.get('duration')
-                video_file.resolution_w = meta.get('width')
-                video_file.resolution_h = meta.get('height')
+            if metadata is not None:
+                video_file.duration = metadata.get('duration')
+                video_file.resolution_w = metadata.get('width')
+                video_file.resolution_h = metadata.get('height')
+                video_file.kf_tile_size = metadata.get('tileSize')
+                video_file.kf_frame_width = metadata.get('frameWidth')
+                video_file.kf_frame_height = metadata.get('frameHeight')
+                video_file.kf_image_path_list = metadata.get('keyframeImagePathList')
 
         def update_video_files():
             session = SessionManager.Session()
@@ -66,7 +69,13 @@ class DownloadManager:
                 video_file.status = VideoFile.STATUS_DOWNLOADED
                 episode.update_time = datetime.utcnow()
                 episode.status = Episode.STATUS_DOWNLOADED
-                create_thumbnail(episode)
+                color = metadata.get('dominantColorOfThumbnail', '#000000')
+                episode.thumbnail_image = Image(file_path=metadata['thumbnailPath'],
+                                                dominant_color=color,
+                                                width=metadata.get('width'),
+                                                height=metadata.get('height'))
+                episode.thumbnail_color = color
+                # create_thumbnail(episode)
                 update_video_meta(video_file)
                 episode_id = str(episode.id)
 

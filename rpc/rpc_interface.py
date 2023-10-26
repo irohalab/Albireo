@@ -17,6 +17,7 @@ from web_hook.dispatcher import dispatcher
 import logging
 import yaml
 import urllib
+import json
 
 
 logger = logging.getLogger(__name__)
@@ -48,6 +49,16 @@ class RPCInterface(resource.Resource):
         else:
             print('no such a method ({0}) found'.format(rpc_method,))
         return ''
+
+    def render_POST(self, request):
+        rpc_method = request.path[1:]
+        req_body = json.loads(request.content.read())
+        if rpc_method in rpc_exported_dict:
+            rpc_exported_dict[rpc_method](**req_body)
+        else:
+            print('no such a method ({0}) found'.format(rpc_method,))
+        return ''
+
 
 
 def setup_server():
@@ -267,14 +278,11 @@ def delete_deluge_torrent(torrent_id):
 
 
 @rpc_export
-def download_complete(video_id, bangumi_id, file_path_list):
+def download_complete(video_id, bangumi_id, file_path_list, metadata):
 
     from utils.DownloadManager import download_manager
 
-    file_path_list_str = urllib.unquote(str(file_path_list)).decode('utf-8')
-    logger.info('download complete ' + video_id + " file: " + file_path_list_str)
-    # file_path_list is separated by comma
-    file_path_list = file_path_list_str.split(',')
+    logger.info('download complete ' + video_id + " file: " + str(file_path_list))
 
     def on_success(result):
         logger.info('post process of video file ' + video_id + ' completed, bangumi_id: ' + bangumi_id)
@@ -283,6 +291,6 @@ def download_complete(video_id, bangumi_id, file_path_list):
         logger.error(err)
 
     # though the download result is a list, we now only support one file
-    d = download_manager.on_download_completed(video_id, file_path_list[0])
+    d = download_manager.on_download_completed(video_id, file_path_list[0], metadata)
     d.addCallback(on_success)
     d.addErrback(on_fail)
