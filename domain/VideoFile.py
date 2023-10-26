@@ -1,3 +1,5 @@
+from sqlalchemy.dialects.postgresql import JSONB
+
 from domain.base import Base
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.dialects import postgresql
@@ -25,6 +27,10 @@ class VideoFile(Base):
     resolution_h = Column(Integer, nullable=True)
     duration = Column(Integer, nullable=True)  # unit is millisecond
     label = Column(String, nullable=True)  # label can be set by admin
+    kf_tile_size = Column(Integer, nullable=True)
+    kf_frame_width = Column(Integer, nullable=True)
+    kf_frame_height = Column(Integer, nullable=True)
+    kf_image_path_list = Column(JSONB, nullable=True)
 
     episode = relationship('Episode', back_populates='video_files')
     bangumi = relationship('Bangumi', back_populates='video_files')

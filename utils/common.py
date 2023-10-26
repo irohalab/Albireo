@@ -34,7 +34,10 @@ class CommonUtils:
                 print exception
 
     def generate_thumbnail_link(self, episode, bangumi):
-        thumbnail_url = '/pic/{0}/thumbnails/{1}.png'.format(str(bangumi.id), str(episode.episode_no))
+        if episode.thumbnail_image is not None:
+            thumbnail_url = '/pic/{0}'.format(str(episode.thumbnail_image.file_path))
+        else:
+            thumbnail_url = '/pic/{0}/thumbnails/{1}.png'.format(str(bangumi.id), str(episode.episode_no))
         if self.image_domain is not None:
             thumbnail_url = self.image_domain + thumbnail_url
         return thumbnail_url
@@ -52,6 +55,15 @@ class CommonUtils:
         if self.video_domain is not None:
             video_link = self.video_domain + video_link
         return video_link
+
+    def generate_keyframe_image_link(self, image_path_list):
+        image_url_list = []
+        for image_path in image_path_list:
+            image_url = '/pic/{0}'.format(image_path)
+            if self.image_domain is not None:
+                image_url = self.image_domain + image_url
+            image_url_list.append(image_url)
+        return image_url_list
 
     def convert_image_dict(self, image_dict):
         new_dict = {

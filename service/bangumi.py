@@ -93,6 +93,8 @@ class BangumiService:
                         continue
                     video_file_dict = row2dict(video_file, VideoFile)
                     video_file_dict['url'] = utils.generate_video_link(str(bangumi.id), video_file.file_path)
+                    if video_file.kf_image_path_list is not None:
+                        video_file_dict['kf_image_path_list'] = utils.generate_keyframe_image_link(video_file.kf_image_path_list)
                     episode_dict['video_files'].append(video_file_dict)
 
             return json_resp(episode_dict)

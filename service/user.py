@@ -265,7 +265,7 @@ class UserCredential(UserMixin):
         session = SessionManager.Session()
         try:
             user = session.query(User).filter(User.name == name).one()
-            if check_password_hash(user.password, password):
+            if check_password_hash(user.password.encode('utf-8'), password.encode('utf-8')):
                 credential = cls(user)
                 SessionManager.Session.remove()
                 return credential
