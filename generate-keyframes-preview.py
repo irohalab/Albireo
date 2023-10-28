@@ -23,6 +23,7 @@ from domain.WebHookToken import WebHookToken
 
 import yaml
 import os
+import nanoid
 
 TILE_SIZE = 10
 SCALE_HEIGHT = 120
@@ -53,7 +54,7 @@ def generate_keyframes(video_file, video_path):
         # if video_file.tile_size * video_file.frame_width > MAX_PIC_WIDTH:
         #     video_file.tile_size = int(floor(MAX_PIC_WIDTH/video_file.frame_width))
         image_dir_path = os.path.dirname(video_path)
-        image_filename_base = 'keyframes-{0}'.format(os.path.basename(os.path.splitext(video_path)[0]))
+        image_filename_base = 'keyframes-{0}'.format(nanoid.generate(8))
         keyframe_image_path = image_dir_path + '/' + '{0}-%3d.jpg'.format(image_filename_base)
         subprocess.check_call(['ffmpeg','-y', '-i', video_path, '-vf',
              'select=isnan(prev_selected_t)+gte(t-prev_selected_t\\,2),scale={0}:{1},tile={2}x{2}'.format(
