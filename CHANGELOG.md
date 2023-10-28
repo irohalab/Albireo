@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.4.1
+- fix bugs for unicode issue
+- Add generate script for old video_file
+
 ## 4.4.0
 - Add support for keyframe and thumbnail from mira-video-manager
 - metadata will not from this service but from mira-video-manager
