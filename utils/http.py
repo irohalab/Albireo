@@ -77,7 +77,7 @@ class FileDownloader:
     def download_file(self, url, file_path, force_https=False):
         if force_https and url.startswith('http://'):
             url = url.replace('http://', 'https://', 1)
-        print url
+        print(url)
         r = self.session.get(url, stream=True, proxies=self.proxy)
 
         if r.status_code > 399:

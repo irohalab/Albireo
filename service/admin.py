@@ -55,13 +55,13 @@ class AdminService:
         try:
             if not os.path.exists(self.base_path):
                 os.makedirs(self.base_path)
-                print 'create base dir %s successfully' % self.base_path
+                print('create base dir %s successfully' % self.base_path)
         except OSError as exception:
             if exception.errno == errno.EACCES:
                 # permission denied
                 raise exception
             else:
-                print exception
+                print(exception)
 
     def __get_eps_len(self, eps):
         EPISODE_TYPE = 0 # episode type = 0 is the normal episode type, even the episode is not a 24min length
@@ -87,14 +87,14 @@ class AdminService:
         try:
             if not os.path.exists(bangumi_path):
                 os.makedirs(bangumi_path)
-                print 'create base dir %s successfully' % self.base_path
+                print('create base dir %s successfully' % self.base_path)
         except OSError as exception:
             if exception.errno == errno.EACCES:
                 # permission denied
                 raise exception
             else:
                 sentry_wrapper.sentry_middleware.captureException()
-                print exception
+                print(exception)
 
         path = urlparse(bangumi.image).path
         extname = os.path.splitext(path)[1]

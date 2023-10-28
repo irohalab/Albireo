@@ -116,21 +116,21 @@ elif args.cover:
                 # if bangumi folder is not existence create it
                 if not os.path.exists(bangumi_dir):
                     os.makedirs(bangumi_dir)
-                    print 'bangumi %s folder created' % (str(bangumi.id),)
+                    print('bangumi %s folder created' % (str(bangumi.id),))
 
                 path = urlparse(bangumi.image).path
                 extname = os.path.splitext(path)[1]
                 bangumi_cover_path = bangumi_dir + '/cover' + extname
                 if not os.path.exists(bangumi_cover_path):
                     # download bangumi image
-                    print 'start to download bangumi cover of %s (%s)' % (bangumi.name, str(bangumi.id))
+                    print('start to download bangumi cover of %s (%s)' % (bangumi.name, str(bangumi.id)))
                     file_downloader.download_file(bangumi.image, bangumi_cover_path)
                 if bangumi.cover_color is None:
                     try:
                         bangumi.cover_color = get_dominant_color(bangumi_cover_path, 5)
                         session.commit()
                     except Exception as err:
-                        print err
+                        print(err)
                 if bangumi.cover_image_id is None:
                     try:
                         width, height = get_dimension(bangumi_cover_path)
@@ -141,13 +141,13 @@ elif args.cover:
                         bangumi.cover_image = cover_image
                         session.commit()
                     except Exception as err:
-                        print err
+                        print(err)
             except OSError as exception:
                 if exception.errno == errno.EACCES:
                     # permission denied
                     raise exception
                 else:
-                    print exception
+                    print(exception)
 
         # check episode thumbnail color
         eps_cur = session.query(Episode).filter(Episode.bangumi_id == bangumi.id)
@@ -158,7 +158,7 @@ elif args.cover:
                     episode.thumbnail_color = get_dominant_color(thumbnail_path, 5)
                     session.commit()
                 except Exception as err:
-                    print err
+                    print(err)
             if episode.status == Episode.STATUS_DOWNLOADED and episode.thumbnail_image_id is None:
                 thumbnail_path = '{0}/thumbnails/{1}.png'.format(str(bangumi.id), str(episode.episode_no))
                 thumbnail_file_path = '{0}/{1}'.format(download_location, thumbnail_path)
@@ -169,7 +169,7 @@ elif args.cover:
                                         height=height)
                 episode.thumbnail_image = thumbnail_image
                 session.commit()
-        print 'finish check bangumi #{0}'.format(str(bangumi.id))
+        print('finish check bangumi #{0}'.format(str(bangumi.id)))
 
 elif args.bgm_reset:
     session = SessionManager.Session()

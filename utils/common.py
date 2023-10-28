@@ -25,17 +25,17 @@ class CommonUtils:
         try:
             if not os.path.exists(self.base_path):
                 os.makedirs(self.base_path)
-                print 'create base dir %s successfully' % self.base_path
+                print('create base dir {0} successfully'.format(self.base_path))
         except OSError as exception:
             if exception.errno == errno.EACCES:
                 # permission denied
                 raise exception
             else:
-                print exception
+                print(exception)
 
     def generate_thumbnail_link(self, episode, bangumi):
         if episode.thumbnail_image is not None:
-            thumbnail_url = '/pic/{0}'.format(str(episode.thumbnail_image.file_path))
+            thumbnail_url = u'/pic/{0}'.format(episode.thumbnail_image.file_path)
         else:
             thumbnail_url = '/pic/{0}/thumbnails/{1}.png'.format(str(bangumi.id), str(episode.episode_no))
         if self.image_domain is not None:
@@ -67,7 +67,7 @@ class CommonUtils:
 
     def convert_image_dict(self, image_dict):
         new_dict = {
-            'url': '/pic/{0}'.format(image_dict['file_path']),
+            'url': u'/pic/{0}'.format(image_dict['file_path']),
             'dominant_color': image_dict.get('dominant_color'),
             'width': image_dict.get('width'),
             'height': image_dict.get('height')
