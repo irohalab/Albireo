@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>A Video Job Failed</title>
+</head>
+<body>
+<p>Dear {{ maintainer['name'] }},</p>
+<p>
+    We inform you there is a video job of the bangumi <strong>{{bangumi_dict['name']}}</strong> failed and you're the
+    maintainer of the bangumi.
+</p>
+<p><strong>Video Job:</strong>&nbsp;<a href="{{ job_dict['url'] }}" target="_blank">{{ job_dict['id'] }}</a></p>
+<p><strong>Bangumi: </strong>&nbsp;<a href="{{ bangumi_dict['url'] }}">{{ bangumi_dict['name'] }}&nbsp;(Episode:{{ episode_dict['episode_no'] }})</a></p>
+</body>
+</html>
+

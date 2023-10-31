@@ -4,6 +4,7 @@ from twisted.internet import reactor, endpoints, threads
 
 from utils.SessionManager import SessionManager
 from utils.db import row2dict
+from utils.JobFailureNotification import job_failure_notification
 from domain.Favorites import Favorites
 from domain.WebHookToken import WebHookToken
 from domain.WebHook import WebHook
@@ -28,8 +29,8 @@ rpc_exported_dict = {}
 def rpc_export(f):
     func_name = f.__name__
     rpc_exported_dict[func_name] = f
-    print func_name
-    print rpc_exported_dict
+    print(func_name)
+    print(rpc_exported_dict)
     # @wraps(f)
     # def wrapper(*args, **kwargs):
     #     return f(*args, **kwargs)
@@ -292,5 +293,21 @@ def download_complete(video_id, bangumi_id, file_path_list, metadata):
 
     # though the download result is a list, we now only support one file
     d = download_manager.on_download_completed(video_id, file_path_list[0], metadata)
+    d.addCallback(on_success)
+    d.addErrback(on_fail)
+
+
+@rpc_export
+def video_job_failed(job):
+    if job is None or job.get('video_id') is None:
+        logger.error('job is none')
+    def on_success(info):
+        logger.info(info)
+        logger.info('video job failure mail send successfully')
+
+    def on_fail(err):
+        logger.error(err)
+
+    d = job_failure_notification.send_notification(job)
     d.addCallback(on_success)
     d.addErrback(on_fail)

@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.4.2
+- add email notification for video job failure
+
 ## 4.4.1
 - fix bugs for unicode issue
 - Add generate script for old video_file
