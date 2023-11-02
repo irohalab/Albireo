@@ -53,6 +53,7 @@ class JobFailureNotification:
     @inlineCallbacks
     def send_notification(self, job):
         yield threads.deferToThread(self.__send_notification, job)
+
     def __send_notification(self, job):
         session = SessionManager.Session()
         try:
