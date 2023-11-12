@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.5.0
+- add API for download directly, update universal feed API to return all files.
+
 ## 4.4.2
 - add email notification for video job failure
 
