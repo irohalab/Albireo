@@ -202,9 +202,10 @@ class FeedService(object):
             item['eps_no_list'] = []
             for media_file in media_files:
                 if media_file['ext'] not in VIDEO_FILE_EXT:
-                    continue
-                eps_no = self.parse_episode_number(media_file['name'])
-                item['eps_no_list'].append({'eps_no': eps_no, 'format': media_file['ext'][1:]})
+                    item['eps_no_list'].append({'eps_no': -1, 'format': media_file['ext'][1:]})
+                else:
+                    eps_no = self.parse_episode_number(media_file['name'])
+                    item['eps_no_list'].append({'eps_no': eps_no, 'format': media_file['ext'][1:]})
         return json_resp({'data': search_result, 'status': 0})
 
     def get_universal_meta(self):

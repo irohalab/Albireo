@@ -166,16 +166,12 @@ def update_video_file(video_file_id):
 def delete_video_file(video_file_id):
     return admin_service.delete_video_file(video_file_id)
 
-# @admin_api.route('/episode/<episode_id>/upload', methods=['POST'])
-# @login_required
-# @auth_user(User.LEVEL_ADMIN)
-# def upload_episode(episode_id):
-#     if 'file' not in request.files:
-#         raise ClientError(ClientError.NOT_VALID_BODY)
-#
-#     file = request.files['file']
-#     if file.filename == '':
-#         raise ClientError(ClientError.NOT_VALID_BODY)
-#
-#     if file:
-#         return admin_service.upload_episode(episode_id, file)
+
+@admin_api.route('/download-directly', methods=['POST'])
+@login_required
+@auth_user(User.LEVEL_ADMIN)
+def download_directly():
+    payload = json.loads(request.get_data(as_text=True))
+    bangumi_id = payload.get('bangumi_id')
+    url_eps_list = payload.get('url_eps_list')
+    return admin_service.download_directly(url_eps_list, bangumi_id)
