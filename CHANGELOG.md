@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.6.0
+- Add API for sync episodes with bgm.tv
+
 ## 4.5.0
 - add API for download directly, update universal feed API to return all files.
 
