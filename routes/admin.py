@@ -175,3 +175,13 @@ def download_directly():
     bangumi_id = payload.get('bangumi_id')
     url_eps_list = payload.get('url_eps_list')
     return admin_service.download_directly(url_eps_list, bangumi_id)
+
+
+@admin_api.route('/sync-episodes', methods=['POST'])
+@login_required
+@auth_user(User.LEVEL_ADMIN)
+def sync_episodes():
+    payload = json.loads(request.get_data(as_text=True))
+    bangumi_id = payload.get('bangumi_id')
+    bgm_id = payload.get('bgm_id')
+    return admin_service.sync_episodes(bangumi_id, bgm_id)

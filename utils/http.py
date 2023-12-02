@@ -58,6 +58,10 @@ def is_valid_date(date_str):
         return False
 
 
+def is_non_or_empty(test_str):
+    return test_str is None or test_str == ''
+
+
 def is_absolute_url(test_url):
     return bool(urlparse.urlparse(test_url).netloc)
 
