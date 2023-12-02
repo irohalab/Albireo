@@ -13,7 +13,7 @@ from datetime import datetime
 from domain.WatchProgress import WatchProgress
 from utils.SessionManager import SessionManager
 from utils.exceptions import ClientError, ServerError
-from utils.http import json_resp, FileDownloader, bangumi_request, rpc_request, is_valid_date
+from utils.http import json_resp, FileDownloader, bangumi_request, is_valid_date, is_non_or_empty
 from utils.db import row2dict
 from sqlalchemy.sql.expression import or_, desc, asc
 from sqlalchemy.sql import select, func
@@ -683,6 +683,94 @@ class AdminService:
         except Exception as error:
             session.rollback()
             logger.error(error)
+            raise ServerError('Internal Server Error')
+        finally:
+            SessionManager.Session.remove()
+
+    def sync_episodes(self, bangumi_id, bgm_id):
+        session = SessionManager.Session()
+        try:
+            bangumi_tv_url_base = 'http://api.bgm.tv/subject/'
+            bangumi_tv_url_param = '?responseGroup=large'
+            bangumi_tv_url = bangumi_tv_url_base + str(bgm_id) + bangumi_tv_url_param
+            r = bangumi_request.get(bangumi_tv_url)
+            if r.status_code >= 400:
+                r.raise_for_status()
+
+            bangumi_info = r.json()
+            eps_list = bangumi_info.get('eps')
+            if eps_list is not None:
+                bangumi = session.query(Bangumi).\
+                    options(joinedload(Bangumi.episodes)).\
+                    filter(Bangumi.id==bangumi_id).\
+                    one()
+
+                episode_mapping = {}
+                new_episodes_list = []
+                removed_episodes_list = []
+                updated_episodes_list = []
+                for episode in bangumi.episodes:
+                    episode_mapping[episode.bgm_eps_id] = episode
+
+                for eps in eps_list:
+                    if eps['type'] != 0:
+                        continue
+                    eps_bgm_id = eps['id']
+                    if is_valid_date(eps.get('airdate')):
+                        eps['airdate'] = eps.get('airdate')
+                    else:
+                        eps['airdate'] = None
+                    matched_episode = episode_mapping.get(eps_bgm_id)
+                    if matched_episode is None:
+                        new_episode = Episode(bangumi_id=bangumi_id,
+                                bgm_eps_id=eps_bgm_id,
+                                episode_no=eps['sort'],
+                                name=eps.get('name'),
+                                name_cn=eps.get('name_cn'),
+                                duration=eps.get('duration'),
+                                airdate=eps.get('airdate'),
+                                status=Episode.STATUS_NOT_DOWNLOADED)
+                        session.add(new_episode)
+                        bangumi.eps = bangumi.eps + 1
+                        new_episodes_list.append(row2dict(new_episode, Episode))
+                    else:
+                        episode_changed = False
+                        if matched_episode.name == '' and not is_non_or_empty(eps.get('name')):
+                            matched_episode.name = eps['name']
+                            episode_changed = True
+                        if matched_episode.name_cn == '' and not is_non_or_empty(eps.get('name_cn')):
+                            matched_episode.name_cn = eps['name_cn']
+                            episode_changed = True
+                        if matched_episode.duration == '' and not is_non_or_empty(eps.get('duration')):
+                            matched_episode.duration = eps['duration']
+                            episode_changed = True
+                        if is_valid_date(eps['airdate']) and unicode(matched_episode.airdate) != eps['airdate']:
+                            matched_episode.airdate = eps['airdate']
+                            episode_changed = True
+                        if episode_changed:
+                            session.add(matched_episode)
+                            updated_episodes_list.append(row2dict(matched_episode, Episode))
+                        # remove episode from mapping
+                        episode_mapping.pop(eps_bgm_id)
+
+                if len(episode_mapping) > 0:
+                    for episode in episode_mapping.values():
+                        removed_episodes_list.append(row2dict(episode, Episode))
+
+                session.commit()
+                return json_resp({
+                    'data': {
+                        'new_episodes': new_episodes_list,
+                        'removed_episodes': removed_episodes_list,
+                        'updated_episodes': updated_episodes_list
+                    },
+                    'status': 0
+                })
+            else:
+                return json_resp({'msg': 'bgm_id not found in bgm.tv', 'status': 1})
+        except Exception as error:
+            session.rollback()
+            logger.error(error, exc_info=True)
             raise ServerError('Internal Server Error')
         finally:
             SessionManager.Session.remove()
