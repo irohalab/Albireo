@@ -2,7 +2,9 @@ from datetime import datetime
 
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import func
-from sqlalchemy.sql.expression import desc, asc
+from sqlalchemy.sql.expression import desc, asc, or_
+
+from domain.VideoFile import VideoFile
 from utils.SessionManager import SessionManager
 from utils.exceptions import ClientError
 from utils.http import json_resp, rpc_request
@@ -245,7 +247,7 @@ class WatchService:
                 bangumi_dict['favorite_status'] = fav.status
                 bangumi_dict['favorite_update_time'] = fav.update_time
                 bangumi_dict['favorite_check_time'] = fav.check_time
-                bangumi_dict['cover'] = utils.generate_cover_link(bangumi)
+                bangumi_dict['cover'] = utils.generate_cover_link(bgm)
                 utils.process_bangumi_dict(bgm, bangumi_dict)
                 for unwatched_count, bangumi_id in episode_aggregation:
                     if bangumi_id == bgm.id:
@@ -274,5 +276,37 @@ class WatchService:
             favorite.check_time = datetime.utcnow()
             return json_resp({'data': favorite.check_time, 'status': 0})
 
+    def list_history(self, user_id, offset, limit):
+        session = SessionManager.Session()
+        try:
+            queryObject = session.query(WatchProgress, VideoFile).\
+                options(joinedload(WatchProgress.episode)).\
+                options(joinedload(WatchProgress.bangumi)).\
+                join(Episode, Episode.id == WatchProgress.episode_id).\
+                join(VideoFile, VideoFile.episode_id == WatchProgress.episode_id).\
+                filter(WatchProgress.user_id == user_id).\
+                filter(Episode.status == Episode.STATUS_DOWNLOADED).\
+                filter(VideoFile.status == VideoFile.STATUS_DOWNLOADED)
+
+            total = queryObject.count()
+
+            result = queryObject.order_by(desc(getattr(WatchProgress, 'last_watch_time'))).\
+                offset(offset).\
+                limit(limit).\
+                all()
+            watch_progress_list = []
+            for watch_progress, video_file in result:
+                watch_progress_dict = row2dict(watch_progress, WatchProgress)
+                watch_progress_dict['episode'] = row2dict(watch_progress.episode, Episode)
+                watch_progress_dict['bangumi'] = row2dict(watch_progress.bangumi, Bangumi)
+                watch_progress_dict['video_file'] = row2dict(video_file, VideoFile)
+                if video_file.kf_image_path_list is not None:
+                    watch_progress_dict['video_file']['kf_image_path_list'] = utils.generate_keyframe_image_link(
+                        video_file.kf_image_path_list)
+                watch_progress_list.append(watch_progress_dict)
+
+            return json_resp({'data': watch_progress_list, 'total': total, 'status': 0})
+        finally:
+            SessionManager.Session.remove()
 
 watch_service = WatchService()

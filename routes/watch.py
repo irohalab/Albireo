@@ -56,3 +56,11 @@ def synchronize_history():
 @login_required
 def check_favorite(bangumi_id):
     return watch_service.check_favorite(bangumi_id, current_user.id)
+
+
+@watch_api.route('/history', methods=['GET'])
+@login_required
+def list_history():
+    offset = int(request.args.get('offset'))
+    limit = int(request.args.get('limit'))
+    return watch_service.list_history(current_user.id, offset, limit)
