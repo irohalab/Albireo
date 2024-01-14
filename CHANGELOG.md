@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.7.0
+- Add API for listing history with pagination support
+
 ## 4.6.0
 - Add API for sync episodes with bgm.tv
 
