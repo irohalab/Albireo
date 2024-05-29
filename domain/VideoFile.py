@@ -31,6 +31,7 @@ class VideoFile(Base):
     kf_frame_width = Column(Integer, nullable=True)
     kf_frame_height = Column(Integer, nullable=True)
     kf_image_path_list = Column(JSONB, nullable=True)
+    blob_storage_url_v0 = Column(String, nullable=True)
 
     episode = relationship('Episode', back_populates='video_files')
     bangumi = relationship('Bangumi', back_populates='video_files')
