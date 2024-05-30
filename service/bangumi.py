@@ -92,7 +92,10 @@ class BangumiService:
                     if video_file.status != VideoFile.STATUS_DOWNLOADED:
                         continue
                     video_file_dict = row2dict(video_file, VideoFile)
-                    video_file_dict['url'] = utils.generate_video_link(str(bangumi.id), video_file.file_path)
+                    if not video_file.blob_storage_url_v0:
+                        video_file_dict['url'] = utils.generate_video_link(str(bangumi.id), video_file.file_path)
+                    else:
+                        video_file_dict['url'] = video_file.blob_storage_url_v0
                     if video_file.kf_image_path_list is not None:
                         video_file_dict['kf_image_path_list'] = utils.generate_keyframe_image_link(video_file.kf_image_path_list)
                     episode_dict['video_files'].append(video_file_dict)
@@ -241,6 +244,13 @@ class BangumiService:
                     continue
                 eps = row2dict(episode, Episode)
                 eps['thumbnail'] = utils.generate_thumbnail_link(episode, bangumi)
+                if episode.is_blob_storage_url_v0():
+                    eps['thumbnail_image'] = {
+                        "url": "https://f002.backblazeb2.com/file/suki-moe-blob-storage-v0/blob_storage_url_v0_thumbnail.png",
+                        "dominant_color": "#000000",
+                        "width": 20,
+                        "height": 20
+                    }
                 utils.process_episode_dict(episode, eps)
                 if episode.id in watch_progress_hash_table:
                     eps['watch_progress'] = watch_progress_hash_table[episode.id]

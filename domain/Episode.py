@@ -50,3 +50,5 @@ class Episode(Base):
     STATUS_DOWNLOADING = 1
     STATUS_DOWNLOADED = 2
 
+    def is_blob_storage_url_v0(self):
+        return self.video_files and self.video_files[0].blob_storage_url_v0 is not None
