@@ -84,7 +84,7 @@ $ python tools.py --user-add admin 1234  # admin is username 1234 is password
 
 $ python tools.py --user-promote admin 3  # admin is username 3 is the level, currently means super user
 
-$ python tools.py --user-confirm-email admin  # force confirm admin's email so that they can access the admin panel
+$ python tools.py --user-confirm-email admin no@thankyou.com # force confirm admin's email so that they can access the admin panel
 ```
 
 ### set your server locale
