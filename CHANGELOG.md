@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.8.0
+- Add a feature https://github.com/irohalab/Albireo/pull/18 Allow serving Albireo resources from blob storage v0/PoC
+
 ## 4.7.0
 - Add API for listing history with pagination support
 
