@@ -598,7 +598,8 @@ class AdminService:
                                    resolution_w=video_dict.get('resolution_w'),
                                    resolution_h=video_dict.get('resolution_h'),
                                    duration=video_dict.get('duration'),
-                                   label=video_dict.get('label'))
+                                   label=video_dict.get('label'),
+                                   blob_storage_url_v0=video_dict.get('blob_storage_url_v0'))
             session.add(video_file)
             session.commit()
             video_file_id = str(video_file.id)
@@ -618,6 +619,7 @@ class AdminService:
             video_file.resolution_h = video_dict.get('resolution_h')
             video_file.duration = video_dict.get('duration')
             video_file.label = video_dict.get('label')
+            video_file.blob_storage_url_v0 = video_dict.get('blob_storage_url_v0')
             session.commit()
             return json_resp({'msg': 'OK'})
         except NoResultFound:

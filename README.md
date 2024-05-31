@@ -73,6 +73,8 @@ There are some config that must be modified before your run the project
 
 ### init database
 
+copy `alembic.example.ini` to `alembic.ini`
+
 using tools.py in the root directory of this project to init db
 
 ```bash
@@ -81,6 +83,8 @@ $ python tools.py --db-init # create tables if not exists
 $ python tools.py --user-add admin 1234  # admin is username 1234 is password
 
 $ python tools.py --user-promote admin 3  # admin is username 3 is the level, currently means super user
+
+$ python tools.py --user-confirm-email admin no@thankyou.com # force confirm admin's email so that they can access the admin panel
 ```
 
 ### set your server locale

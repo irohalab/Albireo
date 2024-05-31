@@ -37,6 +37,7 @@ group.add_argument('--invite', type=int, metavar=('NUMBER'), help='generate n in
 group.add_argument('--user-add', nargs=2, metavar=('USERNAME', 'PASSWORD'), help='add an user')
 group.add_argument('--user-del', nargs=1, metavar=('USERNAME'), help='delete an user')
 group.add_argument('--user-promote', nargs=2, metavar=('USERNAME', 'LEVEL'), help='promote an user')
+group.add_argument('--user-confirm-email', nargs=2, metavar=('USERNAME', 'EMAIL'), help="force confirm a user's email")
 group.add_argument('--db-init', action='store_true', help='init database, if tables not exists, create it')
 group.add_argument('--cover', action='store_true',
                    help='scan bangumi, download missing cover or generate missing color palette')
@@ -84,6 +85,17 @@ elif args.user_promote is not None:
     level = int(args.user_promote[1])
     user = session.query(User).filter(User.name==username).one()
     user.level = level
+    session.commit()
+    print('Update successfully')
+    SessionManager.Session.remove()
+
+elif args.user_confirm_email is not None:
+    session = SessionManager.Session()
+    username = args.user_confirm_email[0]
+    email = args.user_confirm_email[1]
+    user = session.query(User).filter(User.name==username).one()
+    user.email = email
+    user.email_confirmed = True
     session.commit()
     print('Update successfully')
     SessionManager.Session.remove()
