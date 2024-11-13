@@ -1298,13 +1298,13 @@ delete a web hook token
 - `created_by_uid`: `b50263f6-c1a0-432c-af6b-19f8cb9e58d2` (string) - id of user who create this item.
 - `maintained_by_uid`: `b50263f6-c1a0-432c-af6b-19f8cb9e58d2` (string) - id of user who maintains this item, can be modified.
 
-## BangumiExtended (Bangumi)
+## BangumiFavorite (Bangumi)
+- `favorite_status`: `3` (number, optional) - current favorite status of the bangumi, this field can be one of the following value: 1 (WISH), 2 (WATCHED), 3 (WATCHING), 4 (PAUSE), 5 (ABANDONED)
+
+## BangumiExtended (BangumiFavorite)
 - `episodes` (array[EpisodeWithWatchProgress]) - episode list of the bangumi
 - `created_by` (User, optional) - user object, who is the creator of the bangumi item.
 - `maintained_by` (User, optional) - user object, who is the maintainer of the bangumi item.
-
-## BangumiFavorite (Bangumi)
-- `favorite_status`: `3` (number, optional) - current favorite status of the bangumi, this field can be one of the following value: 1 (WISH), 2 (WATCHED), 3 (WATCHING), 4 (PAUSE), 5 (ABANDONED)
 
 ## BangumiUnwatched (BangumiFavorite)
 - `unwatched_count`: `10` (number, required) - how many episodes which is downloaded but not been watched by current user.
