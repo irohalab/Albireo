@@ -79,6 +79,14 @@ universal:
   bangumi_moe: https://res.iroha.io/bangumi-moe/item
   nyaa: https://res.iroha.io/nyaa/item
   acg_rip: https://res.iroha.io/acg-rip/item
+  mikanani_me: https://res.iroha.io/mikanani-me/item
 
 download_manager_url: 'http://localhost:8081'
 video_manager_url: 'http://localhost:8083'
+
+s3_to_http_url_template: 'http://localhost:8334/${bucket}/${key}'
+
+migration:
+  JWT_ISSUER: 'albireo'
+  JWT_AUDIENCE: 'mira-migration'
+  JWT_SECRET: 'CHANGE-TO-A-VERY-LONG-SECRET'
