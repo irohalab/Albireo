@@ -218,7 +218,7 @@ class AdminService:
             bangumi_dict_list = []
             for bgm in bangumi_list:
                 bangumi = row2dict(bgm, Bangumi)
-                bangumi['cover'] = utils.generate_cover_link(bgm)
+                # bangumi['cover'] = utils.generate_cover_link(bgm)
                 utils.process_bangumi_dict(bgm, bangumi)
                 self.__process_user_obj_in_bangumi(bgm, bangumi)
                 bangumi_dict_list.append(bangumi)
@@ -372,7 +372,7 @@ class AdminService:
             bangumi_dict['episodes'] = episodes
             utils.process_bangumi_dict(bangumi, bangumi_dict)
             self.__process_user_obj_in_bangumi(bangumi, bangumi_dict)
-            bangumi_dict['cover'] = utils.generate_cover_link(bangumi)
+            # bangumi_dict['cover'] = utils.generate_cover_link(bangumi)
 
             return json_resp({'data': bangumi_dict})
         except NoResultFound:
