@@ -31,22 +31,6 @@ class DownloadManager:
     def on_download_completed(self, video_id, file_path, metadata):
         logger.info('Download complete: %s ', video_id)
 
-        def create_thumbnail(episode):
-            time = '00:00:01.000'
-            video_manager.create_episode_thumbnail(episode, file_path, time)
-            try:
-                thumbnail_path = '{0}/thumbnails/{1}.png'.format(str(episode.bangumi_id), episode.episode_no)
-                thumbnail_file_path = '{0}/{1}'.format(self.base_path, thumbnail_path)
-                color = get_dominant_color(thumbnail_file_path)
-                width, height = get_dimension(thumbnail_file_path)
-                episode.thumbnail_image = Image(file_path=thumbnail_path,
-                                                dominant_color=color,
-                                                width=width,
-                                                height=height)
-                episode.thumbnail_color = color
-            except Exception as error:
-                logger.error(error, exc_info=True)
-
         def update_video_meta(video_file):
             if metadata is not None:
                 video_file.duration = metadata.get('duration')
