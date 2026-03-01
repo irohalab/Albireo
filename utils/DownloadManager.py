@@ -91,6 +91,7 @@ class DownloadManager:
         # send an event to web_hook
         episode_downloaded(episode_id=eps_id)
 
+    @inlineCallbacks
     def download(self, download_url, bangumi_id, video_id, file_mapping=None):
         task_id = str(uuid4())
 
@@ -105,18 +106,12 @@ class DownloadManager:
                 'videoId': video_id
             })
 
-        def on_success(resp):
+        try:
+            resp = yield threads.deferToThread(rpc_call)
             logger.info(resp)
-            return task_id
-
-        def on_error(err):
-            logger.error(err)
-            return err
-
-        d = threads.deferToThread(rpc_call)
-        d.addCallback(on_success)
-        d.addErrback(on_error)
-        return d
+        except Exception as err:
+            logger.error('Failed to download %s, video_id: %s, error: %s', download_url, video_id, err, exc_info=True)
+        returnValue(task_id)
 
     def remove_torrents(self, torrent_id_list, remove_data):
         # result_list = []
