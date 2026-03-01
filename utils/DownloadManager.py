@@ -106,11 +106,8 @@ class DownloadManager:
                 'videoId': video_id
             })
 
-        try:
-            resp = yield threads.deferToThread(rpc_call)
-            logger.info(resp)
-        except Exception as err:
-            logger.error('Failed to download %s, video_id: %s, error: %s', download_url, video_id, err, exc_info=True)
+        resp = yield threads.deferToThread(rpc_call)
+        logger.info(resp)
         returnValue(task_id)
 
     def remove_torrents(self, torrent_id_list, remove_data):
