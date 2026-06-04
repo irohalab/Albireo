@@ -1,3 +1,8 @@
+from datetime import datetime, timedelta
+from uuid import uuid4
+
+import jwt
+import yaml
 from flask_login import UserMixin
 from sqlalchemy.exc import IntegrityError, DataError
 from sqlalchemy.orm.exc import NoResultFound
@@ -21,6 +26,14 @@ logger = logging.getLogger(__name__)
 
 PASSWORD_DIGEST_LENGTH = 8
 
+TOKEN_EXPIRY_MINUTES = 1
+
+def get_migration_config():
+    fr = open('./config/config.yml', 'r')
+    config = yaml.load(fr)
+    return config['migration']
+
+migration_config = get_migration_config()
 
 class UserCredential(UserMixin):
 
@@ -316,3 +329,39 @@ class UserCredential(UserMixin):
             raise ServerError(error.message)
         finally:
             SessionManager.Session.remove()
+
+    def generate_migration_token(self):
+        """
+        Generates a short-lived, signed JWT for account migration.
+        The user must already be logged in via Flask-Login (cookie).
+        """
+        try:
+            now = datetime.utcnow()
+
+            # 1. Define the claims (the token's payload)
+            payload = {
+                "iss": migration_config['JWT_ISSUER'],  # Issuer: Who created this token
+                "aud": migration_config['JWT_AUDIENCE'],  # Audience: Who this token is for
+                "iat": now,  # Issued At: When it was created
+                "nbf": now,  # Not Before: When it becomes valid
+                "exp": now + timedelta(minutes=TOKEN_EXPIRY_MINUTES),  # Expiry: CRITICAL
+                "jti": str(uuid4()),  # JWT ID: For replay prevention
+
+                # --- Custom Claims ---
+                "sub": str(self.id),  # Subject: The user's OLD ID
+                "name": self.name,
+                "email": self.email,
+                "level": self.level  # The user's level to determine user's role in the new system.
+            }
+
+            # 2. Create the signed JWT
+            token = jwt.encode(
+                payload,
+                migration_config['JWT_SECRET'],
+                algorithm="HS256"
+            )
+
+            return json_resp({"migration_token": token})
+
+        except Exception as e:
+            raise ServerError({"error": "Token generation failed", "details": str(e)})

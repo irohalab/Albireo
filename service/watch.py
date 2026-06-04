@@ -247,7 +247,7 @@ class WatchService:
                 bangumi_dict['favorite_status'] = fav.status
                 bangumi_dict['favorite_update_time'] = fav.update_time
                 bangumi_dict['favorite_check_time'] = fav.check_time
-                bangumi_dict['cover'] = utils.generate_cover_link(bgm)
+                # bangumi_dict['cover'] = utils.generate_cover_link(bgm)
                 utils.process_bangumi_dict(bgm, bangumi_dict)
                 for unwatched_count, bangumi_id in episode_aggregation:
                     if bangumi_id == bgm.id:

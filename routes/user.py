@@ -90,7 +90,7 @@ def update_pass():
 @user_api.route('/reset-pass', methods=['POST'])
 def reset_pass():
     """
-    reset password using token    
+    reset password using token
     """
     data = json.loads(request.get_data(True, as_text=True))
     if ('new_pass' in data) and ('new_pass_repeat' in data) and ('token' in data):
@@ -118,12 +118,12 @@ def request_reset_pass():
 def get_user_info():
     """
     get current user name and level
-    :return: response 
+    :return: response
     """
     user_info = {
         'name': current_user.name,
         'level': current_user.level,
-        'email': current_user.email,
+        # 'email': current_user.email,
         'email_confirmed': current_user.email_confirmed
     }
     return json_resp({'data': user_info})
@@ -159,3 +159,11 @@ def send_confirm_mail():
         raise ClientError(ClientError.INVALID_EMAIL)
     current_user.send_confirm_email()
     return json_resp({"message": "ok"})
+
+
+@user_api.route('/migration-token', methods=['POST'])
+@login_required
+def generate_migration_token():
+    if current_user.email is None:
+        raise ClientError(ClientError.INVALID_EMAIL)
+    return current_user.generate_migration_token()

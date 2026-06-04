@@ -53,7 +53,7 @@ class BangumiService:
                 episode = row2dict(eps, Episode)
                 episode['thumbnail'] = utils.generate_thumbnail_link(eps, bgm)
                 episode['bangumi'] = row2dict(bgm, Bangumi)
-                episode['bangumi']['cover'] = utils.generate_cover_link(bgm)
+                # episode['bangumi']['cover'] = utils.generate_cover_link(bgm)
                 episode_list.append(episode)
 
             return json_resp({'data': episode_list})
@@ -77,7 +77,7 @@ class BangumiService:
 
             episode_dict = row2dict(episode, Episode)
             episode_dict['bangumi'] = row2dict(bangumi, Bangumi)
-            episode_dict['bangumi']['cover'] = utils.generate_cover_link(bangumi)
+            # episode_dict['bangumi']['cover'] = utils.generate_cover_link(bangumi)
             utils.process_bangumi_dict(bangumi, episode_dict['bangumi'])
             episode_dict['thumbnail'] = utils.generate_thumbnail_link(episode, bangumi)
             utils.process_episode_dict(episode, episode_dict)
@@ -141,7 +141,7 @@ class BangumiService:
 
             for bangumi_id, bangumi in result:
                 bangumi_dict = row2dict(bangumi, Bangumi)
-                bangumi_dict['cover'] = utils.generate_cover_link(bangumi)
+                # bangumi_dict['cover'] = utils.generate_cover_link(bangumi)
                 utils.process_bangumi_dict(bangumi, bangumi_dict)
                 for fav in favorites:
                     if fav.bangumi_id == bangumi_id:
@@ -200,7 +200,7 @@ class BangumiService:
             bangumi_dict_list = []
             for bgm in bangumi_list:
                 bangumi = row2dict(bgm, Bangumi)
-                bangumi['cover'] = utils.generate_cover_link(bgm)
+                # bangumi['cover'] = utils.generate_cover_link(bgm)
                 utils.process_bangumi_dict(bgm, bangumi)
                 for fav in favorites:
                     if fav.bangumi_id == bgm.id:
@@ -263,7 +263,7 @@ class BangumiService:
 
             bangumi_dict['episodes'] = episodes
 
-            bangumi_dict['cover'] = utils.generate_cover_link(bangumi)
+            # bangumi_dict['cover'] = utils.generate_cover_link(bangumi)
             utils.process_bangumi_dict(bangumi, bangumi_dict)
 
             return json_resp({'data': bangumi_dict})

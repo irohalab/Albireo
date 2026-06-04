@@ -6,9 +6,10 @@ from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
+import domain.ResourceGroup  # noqa: F401 - ensure ResourceGroup is registered with Base
+
 class VideoFile(Base):
     __tablename__ = 'video_file'
-
 
     id = Column(postgresql.UUID(as_uuid=True), primary_key=True, default=uuid4)
     bangumi_id = Column(postgresql.UUID(as_uuid=True), ForeignKey('bangumi.id'), nullable=False)
@@ -32,9 +33,11 @@ class VideoFile(Base):
     kf_frame_height = Column(Integer, nullable=True)
     kf_image_path_list = Column(JSONB, nullable=True)
     blob_storage_url_v0 = Column(String, nullable=True)
+    resourceGroup = Column(ForeignKey(u'resource_group.id'), nullable=False)
 
     episode = relationship('Episode', back_populates='video_files')
     bangumi = relationship('Bangumi', back_populates='video_files')
+    resource_group = relationship('ResourceGroup', back_populates='video_files')
 
     STATUS_DOWNLOAD_PENDING = 1
     STATUS_DOWNLOADING = 2

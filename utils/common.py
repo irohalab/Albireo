@@ -1,3 +1,6 @@
+import re
+from string import Template
+
 import yaml
 import os
 import errno
@@ -22,6 +25,10 @@ class CommonUtils:
         self.base_path = config['download']['location']
         self.image_domain = config['domain']['image']
         self.video_domain = config['domain']['video']
+        if 's3_to_http_url_template' in config:
+            self.s3_to_http_url_template = Template(config['s3_to_http_url_template'])
+        else:
+            self.s3_to_http_url_template = None
         try:
             if not os.path.exists(self.base_path):
                 os.makedirs(self.base_path)
@@ -42,15 +49,10 @@ class CommonUtils:
             thumbnail_url = self.image_domain + thumbnail_url
         return thumbnail_url
 
-    def generate_cover_link(self, bangumi):
-        path = urlparse(bangumi.image).path
-        extname = os.path.splitext(path)[1]
-        cover_url = '/pic/{0}/cover{1}'.format(str(bangumi.id), extname)
-        if self.image_domain is not None:
-            cover_url = self.image_domain + cover_url
-        return cover_url
-
     def generate_video_link(self, bangumi_id, path):
+        converted_path = self.convert_s3_to_http_url(path)
+        if converted_path is not None:
+            return converted_path
         video_link = '/video/{0}/{1}'.format(bangumi_id, path.encode('utf-8'))
         if self.video_domain is not None:
             video_link = self.video_domain + video_link
@@ -59,6 +61,10 @@ class CommonUtils:
     def generate_keyframe_image_link(self, image_path_list):
         image_url_list = []
         for image_path in image_path_list:
+            converted_path = self.convert_s3_to_http_url(image_path)
+            if converted_path is not None:
+                image_url_list.append(converted_path)
+                continue
             image_url = '/pic/{0}'.format(image_path)
             if self.image_domain is not None:
                 image_url = self.image_domain + image_url
@@ -66,8 +72,17 @@ class CommonUtils:
         return image_url_list
 
     def convert_image_dict(self, image_dict):
+        img_url = image_dict.get('url')
+        if img_url is None:
+            image_path = image_dict.get('file_path')
+            if image_path is not None:
+                converted_path = self.convert_s3_to_http_url(image_path)
+                if converted_path is not None:
+                    img_url = converted_path
+                else:
+                    img_url = u'/pic/{0}'.format(image_path)
         new_dict = {
-            'url': u'/pic/{0}'.format(image_dict['file_path']),
+            'url': img_url,
             'dominant_color': image_dict.get('dominant_color'),
             'width': image_dict.get('width'),
             'height': image_dict.get('height')
@@ -88,6 +103,16 @@ class CommonUtils:
 
     def empty_to_none(self, dict, attr_name):
         return dict.get(attr_name, None) if dict.get(attr_name, None) else None
+
+    def convert_s3_to_http_url(self, s3_path):
+        if self.s3_to_http_url_template is None:
+            return None
+        search_result = re.search('^s3://([\w.\-]+)/([\w.\-]+)', s3_path, re.U | re.I)
+        if search_result is None:
+            return None
+        bucket = search_result.group(1)
+        key = search_result.group(2)
+        return self.s3_to_http_url_template.safe_substitute(bucket=bucket, key=key)
 
 
 utils = CommonUtils()

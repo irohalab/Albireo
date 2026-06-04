@@ -23,6 +23,9 @@ class WatchProgress(Base):
 
     percentage = Column(Float, nullable=True)
 
+    subItemId = Column(postgresql.UUID(as_uuid=True), nullable=True)
+    externalSubItemFavoriteId = Column(postgresql.UUID(as_uuid=True), nullable=True)
+
     bangumi = relationship('Bangumi', uselist=False, back_populates='watch_progress_list')
 
     episode = relationship('Episode', uselist=False, back_populates='watch_progress')
