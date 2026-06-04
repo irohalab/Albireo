@@ -1,8 +1,10 @@
+from sqlalchemy.dialects.postgresql import JSONB
+
 from domain.Image import Image
 from domain.base import Base
 from domain.TorrentFile import TorrentFile
 from domain.VideoFile import VideoFile
-from sqlalchemy import Column, Integer, TEXT, DATE, ForeignKey, String, TIMESTAMP
+from sqlalchemy import Column, Integer, TEXT, DATE, ForeignKey, String, TIMESTAMP, SmallInteger, Float, Text, text
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import relationship
 from uuid import uuid4
@@ -31,6 +33,11 @@ class Episode(Base):
     thumbnail_color = Column(String, nullable=True)
 
     thumbnail_image_id = Column(postgresql.UUID(as_uuid=True), nullable=True)
+
+    sub_item_id = Column(postgresql.UUID(as_uuid=True))
+    type = Column(SmallInteger)
+    sort = Column(Float, nullable=False, server_default=text("0"))
+    properties = Column(JSONB(astext_type=Text()), nullable=False, server_default=text("'{}'::jsonb"))
 
     bangumi = relationship('Bangumi', back_populates='episodes')
 

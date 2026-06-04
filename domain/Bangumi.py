@@ -1,9 +1,11 @@
+from sqlalchemy.dialects.postgresql import JSONB
+
 from domain.Image import Image
 from domain.User import User
 from domain.base import Base
 from domain.Episode import Episode
 from domain.VideoFile import VideoFile
-from sqlalchemy import Column, Integer, TEXT, DATE, TIMESTAMP, String
+from sqlalchemy import Column, Integer, TEXT, DATE, TIMESTAMP, String, CheckConstraint, TEXT, Text, text
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import relationship
 from uuid import uuid4
@@ -12,6 +14,10 @@ from datetime import datetime
 
 class Bangumi(Base):
     __tablename__ = 'bangumi'
+    __table_args__ = (
+        CheckConstraint(
+            '"subType" = ANY (ARRAY[\'other\'::text, \'TV\'::text, \'web\'::text, \'OVA\'::text, \'movie\'::text, \'Novel\'::text, \'Comic\'::text, \'Illustration\'::text, \'jp\'::text, \'en\'::text, \'cn\'::text, \'PC\'::text, \'NDS\'::text, \'PSP\'::text, \'PS2\'::text, \'PS3\'::text, \'Xbox360\'::text, \'Mac OS\'::text, \'PS5\'::text, \'Xbox Series X/S\'::text, \'PS4\'::text, \'Xbox One\'::text, \'Nintendo Switch\'::text, \'Wii U\'::text, \'Wii\'::text, \'PS Vita\'::text, \'3DS\'::text, \'iOS\'::text, \'Android\'::text, \'ARC\'::text, \'XBOX\'::text, \'GameCube\'::text, \'Dreamcast\'::text, \'Nitendo 64\'::text, \'PlayStation\'::text, \'SFC\'::text, \'FC\'::text, \'NEOGEO Pocket Color\'::text, \'GBA\'::text, \'GB\'::text, \'Virtual Boy\'::text, \'WonderSwan Color\'::text, \'WonderSwan\'::text])'),
+    )
 
     id = Column(postgresql.UUID(as_uuid=True), primary_key=True, default=uuid4)
     bgm_id = Column(Integer, nullable=False, unique=True)
@@ -61,6 +67,10 @@ class Bangumi(Base):
 
     # how many days exceed the airdate of its episode will make an alert to maintainer.
     alert_timeout = Column(Integer, default=2, nullable=False)
+
+    item_id = Column(postgresql.UUID(as_uuid=True))
+    subType = Column(TEXT)
+    properties = Column(JSONB(astext_type=Text()), nullable=False, server_default=text("'{}'::jsonb"))
 
     # relationships
     episodes = relationship('Episode', order_by=Episode.episode_no, back_populates='bangumi',

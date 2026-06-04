@@ -17,6 +17,8 @@ class Favorites(Base):
     update_time = Column(TIMESTAMP, default=datetime.utcnow, nullable=False)
     # check_time is the last time user check this bangumi
     check_time = Column(TIMESTAMP, default=datetime.utcnow, nullable=False)
+    itemId = Column(postgresql.UUID(as_uuid=True), nullable=True)
+    externalFavoriteId = Column(postgresql.UUID(as_uuid=True), nullable=True)
 
     bangumi = relationship('Bangumi', uselist=False, back_populates='favorite')
 
