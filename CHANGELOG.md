@@ -1,4 +1,6 @@
 # Changelog
+# 5.0.0
+- Add v3 UI compatibility
 
 ## 4.8.0
 - Add a feature https://github.com/irohalab/Albireo/pull/18 Allow serving Albireo resources from blob storage v0/PoC
