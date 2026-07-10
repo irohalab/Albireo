@@ -1,4 +1,7 @@
 # Changelog
+# 5.0.1
+Make sure old API create Favorite and watch-progress can have necessary fields for new table structure.
+
 # 5.0.0
 - Add v3 UI compatibility
 
