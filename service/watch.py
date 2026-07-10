@@ -31,7 +31,12 @@ class WatchService:
                 filter(Favorites.user_id == user_id).\
                 first()
             if not favorite:
-                favorite = Favorites(bangumi_id=bangumi_id, user_id=user_id, status=status)
+                bangumi = session.query(Bangumi).\
+                    filter(Bangumi.id == bangumi_id).\
+                    first()
+                if not bangumi:
+                    raise ClientError(ClientError.NOT_FOUND, 404)
+                favorite = Favorites(bangumi_id=bangumi_id, user_id=user_id, status=status, itemId=bangumi.item_id)
                 session.add(favorite)
             else:
                 favorite.status = status
@@ -74,10 +79,14 @@ class WatchService:
                 filter(WatchProgress.user_id == user_id).\
                 first()
             if watch_progress is None:
+                episode = session.query(Episode).filter(Episode.id == episode_id).first()
+                if not episode:
+                    raise ClientError(ClientError.NOT_FOUND, 404)
                 watch_progress = WatchProgress(bangumi_id=bangumi_id,
                                                episode_id=episode_id,
                                                user_id=user_id,
-                                               watch_status=watch_status)
+                                               watch_status=watch_status,
+                                               subItemId=episode.sub_item_id)
                 session.add(watch_progress)
             else:
                 watch_progress.watch_status = watch_status
@@ -114,14 +123,17 @@ class WatchService:
                 filter(WatchProgress.user_id == user_id).\
                 first()
             if watch_progress is None:
-
+                episode = session.query(Episode).filter(Episode.id == episode_id).first()
+                if not episode:
+                    raise ClientError(ClientError.NOT_FOUND, 404)
                 watch_progress = WatchProgress(bangumi_id=bangumi_id,
                                                episode_id=episode_id,
                                                user_id=user_id,
                                                watch_status=watch_status,
                                                last_watch_position=last_watch_position,
                                                last_watch_time=datetime.utcnow(),
-                                               percentage=percentage)
+                                               percentage=percentage,
+                                               subItemId=episode.sub_item_id)
                 session.add(watch_progress)
                 session.commit()
             else:
@@ -148,7 +160,10 @@ class WatchService:
             return json_resp({'message': 'ok', 'status': 0})
         session = SessionManager.Session()
         try:
-            watch_progress_list = session.query(WatchProgress). \
+            episode_list = session.query(Episode).\
+                filter(Episode.id.in_(episode_id_list)).\
+                all()
+            watch_progress_list = session.query(WatchProgress).\
                 filter(WatchProgress.user_id == user_id).\
                 filter(WatchProgress.episode_id.in_(episode_id_list)).\
                 all()
@@ -183,13 +198,17 @@ class WatchService:
                             watch_progress.percentage = record['percentage']
                         break
                 if not record_found:
+                    episode = next((eps for eps in episode_list if eps.id == record['episode_id']), None)
+                    if not episode:
+                        continue
                     watch_progress = WatchProgress(bangumi_id=record['bangumi_id'],
                                                    episode_id=record['episode_id'],
                                                    user_id=user_id,
                                                    watch_status=watch_status,
                                                    last_watch_position=record['last_watch_position'],
                                                    last_watch_time=last_watch_time,
-                                                   percentage=record['percentage'])
+                                                   percentage=record['percentage'],
+                                                   subItemId=episode.sub_item_id)
                     session.add(watch_progress)
             session.commit()
             return json_resp({'message': 'ok', 'status': 0})
