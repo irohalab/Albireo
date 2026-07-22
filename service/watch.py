@@ -155,6 +155,18 @@ class WatchService:
         :param records:
         :return:
         """
+        required_record_fields = ('bangumi_id', 'episode_id', 'last_watch_position',
+                                  'last_watch_time', 'percentage')
+        if not isinstance(records, list):
+            records = []
+        valid_records = [record for record in records
+                         if isinstance(record, dict) and
+                         all(field in record for field in required_record_fields)]
+        if len(valid_records) != len(records):
+            logger.warn('Skipped %d invalid watch history record(s)',
+                        len(records) - len(valid_records))
+        records = valid_records
+
         episode_id_list = [record['episode_id'] for record in records]
         if len(episode_id_list) == 0:
             return json_resp({'message': 'ok', 'status': 0})
