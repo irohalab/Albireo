@@ -1,8 +1,12 @@
 # Changelog
-# 5.0.1
+
+## 5.0.2
+Validate watch history record and drop malformed ones.
+
+## 5.0.1
 Make sure old API create Favorite and watch-progress can have necessary fields for new table structure.
 
-# 5.0.0
+## 5.0.0
 - Add v3 UI compatibility
 
 ## 4.8.0
