@@ -1,5 +1,8 @@
 # Changelog
 
+## 5.1.0
+Set watch_progress.percent to 1 when watch_status is WATCHED and percentage is None
+
 ## 5.0.2
 Validate watch history record and drop malformed ones.
 

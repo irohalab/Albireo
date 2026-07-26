@@ -91,6 +91,10 @@ class WatchService:
             else:
                 watch_progress.watch_status = watch_status
 
+            # set watch_progress.percentage to 1 in order for the client to show the progress only for watch_progress is null.
+            if watch_progress.percentage is None and watch_progress.watch_status == WatchProgress.WATCHED:
+                watch_progress.percentage = 1
+
             session.commit()
             return json_resp({'message': 'ok', 'status': 0})
         finally:
