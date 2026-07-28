@@ -25,10 +25,15 @@ class CommonUtils:
         self.base_path = config['download']['location']
         self.image_domain = config['domain']['image']
         self.video_domain = config['domain']['video']
-        if 's3_to_http_url_template' in config:
-            self.s3_to_http_url_template = Template(config['s3_to_http_url_template'])
-        else:
-            self.s3_to_http_url_template = None
+        self.s3_mode = False
+        if 's3_public_config' in config:
+            self.video_http_url_template = Template(config['s3_public_config']['video_http_url_template'])
+            self.image_http_url_template = Template(config['s3_public_config']['image_http_url_template'])
+            self.fallback_url_template = Template(config['s3_public_config']['fallback_url_template'])
+            self.video_bucket = config['s3_public_config']['video_bucket']
+            self.image_bucket = config['s3_public_config']['image_bucket']
+            self.s3_mode = True
+
         try:
             if not os.path.exists(self.base_path):
                 os.makedirs(self.base_path)
@@ -105,14 +110,19 @@ class CommonUtils:
         return dict.get(attr_name, None) if dict.get(attr_name, None) else None
 
     def convert_s3_to_http_url(self, s3_path):
-        if self.s3_to_http_url_template is None:
+        if not self.s3_mode:
             return None
-        search_result = re.search('^s3://([\w.\-]+)/([\w.\-]+)', s3_path, re.U | re.I)
+        search_result = re.search('^s3://([^/]+)/([^/]+)', s3_path, re.U | re.I)
         if search_result is None:
             return None
         bucket = search_result.group(1)
         key = search_result.group(2)
-        return self.s3_to_http_url_template.safe_substitute(bucket=bucket, key=key)
+        if bucket == self.image_bucket:
+            return self.image_http_url_template.safe_substitute(bucket=bucket, key=key)
+        elif bucket == self.video_bucket:
+            return self.video_http_url_template.safe_substitute(bucket=bucket, key=key)
+        else:
+            return self.fallback_url_template.safe_substitute(bucket=bucket, key=key)
 
 
 utils = CommonUtils()
