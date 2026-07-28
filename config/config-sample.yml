@@ -84,9 +84,16 @@ universal:
 download_manager_url: 'http://localhost:8081'
 video_manager_url: 'http://localhost:8083'
 
-s3_to_http_url_template: 'http://localhost:8334/${bucket}/${key}'
-
 migration:
   JWT_ISSUER: 'albireo'
   JWT_AUDIENCE: 'mira-migration'
   JWT_SECRET: 'CHANGE-TO-A-VERY-LONG-SECRET'
+
+# The config for access S3 bucket and convert the S3 URI in the VideoFile to http url.
+s3_public_config:
+  video_bucket: 'public-video'
+  image_bucket: 'public-image'
+  # the HttpURLPattern should have {bucket} and {key} as placeholder to be replaced by the S3 bucket and key.
+  video_http_url_pattern: 'http://localhost:8333/{bucket}/{key}'
+  image_http_url_pattern: 'http://localhost:8333/{bucket}/{key}'
+  fallback_url_pattern: 'http://localhost:8333/{bucket}/{key}'

@@ -184,13 +184,18 @@ class WatchService:
                 filter(WatchProgress.episode_id.in_(episode_id_list)).\
                 all()
 
+            # episode ids come from the client as strings while the ORM maps them to uuid.UUID,
+            # so always key the lookup tables by the lower cased string form to make both sides comparable.
+            episode_dict = dict((str(episode.id).lower(), episode) for episode in episode_list)
+
             # remove duplicate records, records can be duplicate when client send records concurrently
             eps_id_dict = {}
             for watch_progress in watch_progress_list:
-                episode_id = str(watch_progress.episode_id)
+                episode_id = str(watch_progress.episode_id).lower()
                 if episode_id in eps_id_dict:
-                    if eps_id_dict[episode_id].last_watch_time < watch_progress.last_watch_time:
-                        session.delete(eps_id_dict[episode_id])
+                    kept = eps_id_dict[episode_id]
+                    if (kept.last_watch_time or datetime.min) < (watch_progress.last_watch_time or datetime.min):
+                        session.delete(kept)
                         eps_id_dict[episode_id] = watch_progress
                     else:
                         session.delete(watch_progress)
@@ -200,22 +205,21 @@ class WatchService:
             # synchronize
             for record in records:
                 watch_status = WatchProgress.WATCHED if record.get('is_finished') else WatchProgress.WATCHING
-                last_watch_time = datetime.utcfromtimestamp(record['last_watch_time'] / 1000)
-                record_found = False
-                for watch_progress in watch_progress_list:
-                    if str(watch_progress.episode_id) == record['episode_id']:
-                        record_found = True
-                        if watch_progress.last_watch_time <= last_watch_time:
-                            # Once watch status is Watch. we should not change it to other status
-                            if watch_progress.watch_status is not WatchProgress.WATCHED:
-                                watch_progress.watch_status = watch_status
-                            watch_progress.last_watch_time = last_watch_time
-                            watch_progress.last_watch_position = record['last_watch_position']
-                            watch_progress.percentage = record['percentage']
-                        break
-                if not record_found:
-                    episode = next((eps for eps in episode_list if eps.id == record['episode_id']), None)
+                last_watch_time = datetime.utcfromtimestamp(record['last_watch_time'] / 1000.0)
+                episode_id = record['episode_id'].lower()
+                watch_progress = eps_id_dict.get(episode_id)
+                if watch_progress is not None:
+                    if (watch_progress.last_watch_time or datetime.min) <= last_watch_time:
+                        # Once watch status is Watch. we should not change it to other status
+                        if watch_progress.watch_status != WatchProgress.WATCHED:
+                            watch_progress.watch_status = watch_status
+                        watch_progress.last_watch_time = last_watch_time
+                        watch_progress.last_watch_position = record['last_watch_position']
+                        watch_progress.percentage = record['percentage']
+                else:
+                    episode = episode_dict.get(episode_id)
                     if not episode:
+                        logger.warn('Skipped watch history record of unknown episode %s', episode_id)
                         continue
                     watch_progress = WatchProgress(bangumi_id=record['bangumi_id'],
                                                    episode_id=record['episode_id'],
@@ -226,10 +230,12 @@ class WatchService:
                                                    percentage=record['percentage'],
                                                    subItemId=episode.sub_item_id)
                     session.add(watch_progress)
+                    eps_id_dict[episode_id] = watch_progress
             session.commit()
             return json_resp({'message': 'ok', 'status': 0})
-        except Exception as error:
-            logger.warn(traceback.format_exc(error))
+        except Exception:
+            session.rollback()
+            logger.warn(traceback.format_exc())
             # always return success even operation failed
             return json_resp({'message': 'ok', 'status': 0})
         finally:

@@ -1,4 +1,7 @@
 # Changelog
+## 5.2.0
+Change how the backend will convert S3 URI to http URL to support new backend.
+Fix a bug that causing the backend cannot save watch progress from synchronize_history api.
 
 ## 5.1.0
 Set watch_progress.percent to 1 when watch_status is WATCHED and percentage is None
