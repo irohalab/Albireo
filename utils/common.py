@@ -112,7 +112,7 @@ class CommonUtils:
     def convert_s3_to_http_url(self, s3_path):
         if not self.s3_mode:
             return None
-        search_result = re.search('^s3://([^/]+)/([^/]+)', s3_path, re.U | re.I)
+        search_result = re.search('^s3://([^/]+)/(.+)', s3_path, re.U | re.I)
         if search_result is None:
             return None
         bucket = search_result.group(1)
