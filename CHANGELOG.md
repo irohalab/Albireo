@@ -1,4 +1,8 @@
 # Changelog
+
+## 5.2.1
+Change regex of S3 pattern
+
 ## 5.2.0
 Change how the backend will convert S3 URI to http URL to support new backend.
 Fix a bug that causing the backend cannot save watch progress from synchronize_history api.
