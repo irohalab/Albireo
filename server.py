@@ -28,7 +28,8 @@ from utils.VideoManager import video_manager
 from utils.flask_sessions import PgSessionInterface
 
 ## blueprints
-from routes.admin import admin_api
+# disable admin-route to prevent admin accidentally using this deprecating backend.
+# from routes.admin import admin_api
 from routes.user import user_api
 from routes.home import home_api
 from routes.feed import feed_api
