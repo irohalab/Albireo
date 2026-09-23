@@ -71,7 +71,7 @@ class CommonUtils:
                 image_url_list.append(converted_path)
                 continue
             image_url = '/pic/{0}'.format(image_path)
-            if self.image_domain is not None:
+            if self.image_domain is not None and image_url is not None:
                 image_url = self.image_domain + image_url
             image_url_list.append(image_url)
         return image_url_list
@@ -92,7 +92,7 @@ class CommonUtils:
             'width': image_dict.get('width'),
             'height': image_dict.get('height')
         }
-        if self.image_domain is not None:
+        if self.image_domain is not None and img_url is not None:
             new_dict['url'] = self.image_domain + new_dict['url']
         return new_dict
 

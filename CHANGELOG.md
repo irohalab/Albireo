@@ -1,5 +1,8 @@
 # Changelog
 
+## 6.0.1
+Add type guard in common.py to avoid NoneType exception.
+
 ## 6.0.0
 Breaking Change:
 - Disable admin route, this will prevent admin users to use the deprecating admin APIs. Do not use this version and version afterward if you're still using this backend.
